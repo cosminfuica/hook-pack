@@ -2,6 +2,7 @@
 skills-lock.json
 .claude/*.local.md
 .claude/*.local.json
+.claude
 .internal
 docs/superpowers
 node_modules/
