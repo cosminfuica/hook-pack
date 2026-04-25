@@ -3,6 +3,7 @@ skills-lock.json
 .claude/*.local.md
 .claude/*.local.json
 .claude
+.kilo
 .internal
 docs/reference
 docs/superpowers
