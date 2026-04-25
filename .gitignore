@@ -4,6 +4,7 @@ skills-lock.json
 .claude/*.local.json
 .claude
 .internal
+docs/reference
 docs/superpowers
 node_modules/
 coverage/
