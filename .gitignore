@@ -1,5 +1,9 @@
 .agents
 skills-lock.json
-.claude
+.claude/*.local.md
+.claude/*.local.json
 .internal
 docs/superpowers
+node_modules/
+coverage/
+.env

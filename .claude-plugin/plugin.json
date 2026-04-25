@@ -1,0 +1,27 @@
+{
+  "name": "hook-pack",
+  "version": "0.1.0",
+  "description": "Native Claude Code hook foundation with modular enablement controls.",
+  "author": {
+    "name": "Hook Pack Maintainers"
+  },
+  "license": "MIT",
+  "keywords": ["claude-code", "hooks", "plugin", "policy", "automation"],
+  "userConfig": {
+    "enabled_hooks": {
+      "type": "string",
+      "title": "Enabled hook IDs",
+      "description": "Comma-separated hook IDs to enable for this plugin. Leave empty to use default enablement rules."
+    },
+    "disabled_hooks": {
+      "type": "string",
+      "title": "Disabled hook IDs",
+      "description": "Comma-separated hook IDs to disable for this plugin. Disabled IDs always win over enabled IDs."
+    },
+    "enable_all_hooks_by_default": {
+      "type": "boolean",
+      "title": "Enable all hooks by default",
+      "description": "When true, every implemented hook defaults to enabled unless listed in disabled_hooks."
+    }
+  }
+}

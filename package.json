@@ -1,0 +1,20 @@
+{
+  "name": "hook-pack",
+  "version": "0.1.0",
+  "description": "Native Claude Code hook foundation with modular enablement controls.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test \"dist/tests/**/*.test.js\"",
+    "validate:plugin": "npm run build && node scripts/validate-plugin.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "typescript": "^5.8.3"
+  }
+}
