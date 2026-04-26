@@ -1,10 +1,13 @@
 // Ported from: docs/reference/hooks/rules-injector/parser.test.ts
-// Adaptations: bun:test → node:test/node:assert/strict; no behavior changes.
+// Adaptations:
+// - bun:test → node:test/node:assert/strict
+// - Task 6 matcher parity cases added for picomatch glob patterns from rules-injector matcher port
 
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { parseRuleFrontmatter } from "../../src/hooks/shared/frontmatter.js";
+import { shouldApplyRule } from "../../src/hooks/shared/rule-discovery-matcher.js";
 
 describe("parseRuleFrontmatter", () => {
   describe("applyTo field (GitHub Copilot format)", () => {
@@ -227,5 +230,27 @@ Mixed format`;
       assert.equal(result.metadata.globs, "*.ts");
       assert.equal(result.body, "Windows content");
     });
+  });
+});
+
+describe("rules-injector picomatch matcher", () => {
+  const projectRoot = "/workspace";
+
+  it("matches required Task 6 reference glob patterns", () => {
+    const cases = [
+      { pattern: "src/**/*.ts", matchingPath: "/workspace/src/feature/a.ts", nonMatchingPath: "/workspace/src/feature/a.js" },
+      { pattern: "src/**/*.{ts,tsx}", matchingPath: "/workspace/src/feature/view.tsx", nonMatchingPath: "/workspace/src/feature/view.jsx" },
+      { pattern: "**/*.md", matchingPath: "/workspace/docs/guide.md", nonMatchingPath: "/workspace/docs/guide.txt" },
+      { pattern: "docs/?-guide.md", matchingPath: "/workspace/docs/a-guide.md", nonMatchingPath: "/workspace/docs/ab-guide.md" },
+      { pattern: "docs/{a,b}/*.md", matchingPath: "/workspace/docs/a/guide.md", nonMatchingPath: "/workspace/docs/c/guide.md" }
+    ];
+
+    for (const { pattern, matchingPath, nonMatchingPath } of cases) {
+      assert.deepEqual(shouldApplyRule({ globs: pattern }, matchingPath, projectRoot), {
+        applies: true,
+        reason: `glob: ${pattern}`
+      });
+      assert.deepEqual(shouldApplyRule({ globs: pattern }, nonMatchingPath, projectRoot), { applies: false });
+    }
   });
 });

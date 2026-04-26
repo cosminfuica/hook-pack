@@ -36,6 +36,7 @@ describe("hook registry", () => {
     assert.deepEqual(BUILT_IN_REGISTRY.map((entry) => entry.id), [
       "directory-agents-injector",
       "directory-readme-injector",
+      "rules-injector",
       "write-existing-file-guard"
     ]);
   });

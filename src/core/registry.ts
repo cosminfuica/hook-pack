@@ -41,6 +41,13 @@ export const BUILT_IN_REGISTRY: readonly RegistryEntry[] = [
     defaultEnabled: true
   },
   {
+    id: "rules-injector",
+    events: ["PostToolUse", "PreCompact", "SessionEnd"],
+    runner: { kind: "internal", handlerId: "rules-injector" },
+    timeoutMs: 4000,
+    defaultEnabled: true
+  },
+  {
     id: "write-existing-file-guard",
     events: ["PreToolUse", "PostToolUse", "PreCompact", "SessionEnd"],
     runner: { kind: "internal", handlerId: "write-existing-file-guard" },
