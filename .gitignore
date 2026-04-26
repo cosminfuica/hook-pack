@@ -8,5 +8,6 @@ skills-lock.json
 docs/reference
 docs/superpowers
 node_modules/
+dist/
 coverage/
 .env
