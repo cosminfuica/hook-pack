@@ -41,4 +41,35 @@ describe("foundation documentation", () => {
     assertIncludes(governance, "portable", "migration governance docs");
     assertIncludes(governance, "redesign-needed", "migration governance docs");
   });
+
+  it("documents Tier 1 migrated hook IDs, lifecycle cleanup, and neutrality posture", () => {
+    const readme = readRequiredDoc("README.md");
+    const governance = readRequiredDoc("docs/architecture/migration-governance.md");
+
+    for (const hookId of [
+      "comment-checker",
+      "directory-agents-injector",
+      "directory-readme-injector",
+      "rules-injector",
+      "write-existing-file-guard"
+    ]) {
+      assertIncludes(readme, hookId, "README.md");
+      const recordStart = governance.indexOf(`## Migration Feasibility Record: ${hookId}`);
+      assert.notEqual(recordStart, -1, `migration governance docs must include record header for ${hookId}`);
+      const nextRecordStart = governance.indexOf("## Migration Feasibility Record:", recordStart + 1);
+      const record = governance.slice(recordStart, nextRecordStart === -1 ? undefined : nextRecordStart);
+      assertIncludes(record, `Stable ID: ${hookId}`, `record stable ID for ${hookId}`);
+      assertIncludes(record, "Decision: portable", `record for ${hookId}`);
+      assertIncludes(record, "docs/reference/hooks", `record reference source for ${hookId}`);
+      assertIncludes(record, "### Tests required before implementation", `record test list for ${hookId}`);
+      assertIncludes(record, "Reference test ports:", `record port list for ${hookId}`);
+      assertIncludes(record, "### State and lifecycle", `record state section for ${hookId}`);
+      assertIncludes(record, "### Orchestration neutrality", `record neutrality section for ${hookId}`);
+    }
+
+    assertIncludes(readme, "PreCompact", "README.md");
+    assertIncludes(readme, "SessionEnd", "README.md");
+    assertIncludes(readme, "include_user_rules", "README.md");
+    assertIncludes(readme, "max_context_chars", "README.md");
+  });
 });

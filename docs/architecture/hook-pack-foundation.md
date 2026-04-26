@@ -41,7 +41,7 @@ Config merges defaults, Claude Code plugin options, and `.claude/hook-pack.local
 
 ### Registry layer
 
-`BUILT_IN_REGISTRY` is the only built-in runtime entry list. It is empty during the foundation phase. Future entries must pass ID, timeout, event, and governance checks before they are added.
+`BUILT_IN_REGISTRY` is the only built-in runtime entry list. The foundation phase is complete. Built-in hooks enter the runtime only through `BUILT_IN_REGISTRY`, after migration feasibility records document native Claude Code event mapping, state rules, lifecycle cleanup, failure behavior, tests, and orchestration neutrality.
 
 ### Dispatch layer
 
@@ -68,4 +68,4 @@ Dispatch selects registry entries for the current event and config, runs each se
 
 ## Foundation limits
 
-The foundation does not declare any migrated hook as shipped. It provides the runtime boundary, selection rules, path rules, and governance gate needed to migrate hooks safely later.
+The foundation provides the runtime boundary, selection rules, path rules, and governance gate needed to migrate hooks safely. Runtime entries remain governed by completed migration records and focused tests before registry addition.
