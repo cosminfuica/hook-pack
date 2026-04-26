@@ -25,7 +25,15 @@ export interface RegistrySelection {
   readonly diagnostics: readonly Diagnostic[];
 }
 
-export const BUILT_IN_REGISTRY: readonly RegistryEntry[] = [];
+export const BUILT_IN_REGISTRY: readonly RegistryEntry[] = [
+  {
+    id: "write-existing-file-guard",
+    events: ["PreToolUse", "PostToolUse", "PreCompact", "SessionEnd"],
+    runner: { kind: "internal", handlerId: "write-existing-file-guard" },
+    timeoutMs: 2000,
+    defaultEnabled: true
+  }
+];
 
 const HOOK_ID_PATTERN = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const MIN_TIMEOUT_MS = 1;

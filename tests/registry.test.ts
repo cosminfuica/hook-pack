@@ -32,8 +32,8 @@ describe("hook registry", () => {
     userPrompt: undefined
   };
 
-  it("starts with no built-in entries", () => {
-    assert.deepEqual(BUILT_IN_REGISTRY, []);
+  it("registers implemented Tier 1 hooks in current migration order", () => {
+    assert.deepEqual(BUILT_IN_REGISTRY.map((entry) => entry.id), ["write-existing-file-guard"]);
   });
 
   it("sorts diagnostics by optional hook ID and code", () => {
