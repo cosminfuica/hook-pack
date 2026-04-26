@@ -32,13 +32,43 @@ describe("hook registry", () => {
     userPrompt: undefined
   };
 
-  it("registers implemented Tier 1 hooks in current migration order", () => {
+  it("registers Tier 1 built-in hooks in migration priority order", () => {
     assert.deepEqual(BUILT_IN_REGISTRY.map((entry) => entry.id), [
+      "comment-checker",
       "directory-agents-injector",
       "directory-readme-injector",
       "rules-injector",
       "write-existing-file-guard"
     ]);
+  });
+
+  it("registers comment-checker with lifecycle events, default enablement, and timeout below hook JSON timeout", () => {
+    const entry = BUILT_IN_REGISTRY.find((candidate) => candidate.id === "comment-checker");
+
+    assert.deepEqual(entry, {
+      id: "comment-checker",
+      events: ["PreToolUse", "PostToolUse", "PreCompact", "SessionEnd"],
+      runner: { kind: "internal", handlerId: "comment-checker" },
+      timeoutMs: 8000,
+      defaultEnabled: true
+    });
+  });
+
+  it("includes lifecycle cleanup events for stateful Tier 1 hooks", () => {
+    for (const entry of BUILT_IN_REGISTRY) {
+      assert.ok(entry.events.includes("PreCompact"), `${entry.id} must register PreCompact`);
+      assert.ok(entry.events.includes("SessionEnd"), `${entry.id} must register SessionEnd`);
+    }
+  });
+
+  it("uses defaultEnabled: true and reasonable timeouts for all Tier 1 hooks", () => {
+    for (const entry of BUILT_IN_REGISTRY) {
+      assert.equal(entry.defaultEnabled, true, `${entry.id} must default-enable`);
+      assert.ok(
+        entry.timeoutMs >= 1000 && entry.timeoutMs <= 9000,
+        `${entry.id} timeout must be 1s..9s so it stays below hooks/hooks.json timeout 10s`
+      );
+    }
   });
 
   it("sorts diagnostics by optional hook ID and code", () => {

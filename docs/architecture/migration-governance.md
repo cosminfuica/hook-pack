@@ -94,7 +94,7 @@ The validator requires governance docs for implemented stable IDs. Reviewers che
 
 ## Current foundation status
 
-Tier 1 migration records below are complete before registry entries are added. The runtime registry stays empty until later tasks add tested implementations.
+Tier 1 migration records below describe default-enabled runtime registry entries with tested implementations.
 
 ## Migration Feasibility Record: comment-checker
 
@@ -108,7 +108,7 @@ Date: 2026-04-26
 - Source paths consulted: `docs/reference/hooks/comment-checker/hook.ts`, `docs/reference/hooks/comment-checker/pending-calls.ts`, `docs/reference/hooks/comment-checker/cli-runner.ts`, `docs/reference/hooks/comment-checker/cli.ts`, `docs/reference/hooks/comment-checker/downloader.ts`, `docs/reference/hooks/comment-checker/types.ts`, `docs/reference/hooks/comment-checker/initialization-gate.ts`, `docs/reference/hooks/comment-checker/hook.apply-patch.test.ts`, `docs/reference/hooks/comment-checker/hook.lazy-init.test.ts`, `docs/reference/hooks/comment-checker/cli.test.ts`, `docs/reference/hooks/comment-checker/pending-calls.test.ts`.
 - Original intent: capture write/edit/multiedit-style intent, keep pending call metadata for a short TTL, run an external checker after successful tool output, and treat checker exit code `2` as findings.
 - Original trigger: pre-tool capture for mutating tool input, post-tool evaluation after successful mutating tool output, and lifecycle cleanup for stale pending calls.
-- Missing reference source notes: no shared downloader helper exists outside hook-local `downloader.ts`; port owns Node `child_process.spawn`, `tar` extraction, and plugin-data cache writes. Runtime-proven apply-patch metadata handling is pending Task 7 Step 0 verification: apply_patch parity is conditional on observed Claude runtime metadata. Default fallback: non-portable / dropped if Step 0 evidence is inconclusive, with `docs/reference/hooks/comment-checker/hook.apply-patch.test.ts` retained only as reference evidence.
+- Port/adaptation notes: `docs/reference/hooks/comment-checker/*` files were consulted and the portable write/edit/multiedit, pending-store, runner, downloader, and lifecycle contracts were ported or adapted to native Hook Pack runtime shapes. No shared downloader helper exists outside hook-local references; port owns Node `child_process.spawn`, `tar` extraction, and plugin-data cache writes. Task 7 Step 0 local Claude Code experiment was inconclusive for a portable `apply_patch` `tool_response.metadata.files` before/after contract, so apply-patch parity is intentionally dropped/non-portable for Tier 1 and `docs/reference/hooks/comment-checker/hook.apply-patch.test.ts` remains historical reference evidence only.
 
 ### Claude Code runtime mapping
 
@@ -119,23 +119,23 @@ Date: 2026-04-26
 
 ### State and lifecycle
 
-- State location: `${CLAUDE_PLUGIN_DATA}/comment-checker/pending-calls.json` for pending metadata and `${CLAUDE_PLUGIN_DATA}/comment-checker/bin` for downloaded binaries.
-- Cross-process safety: pending metadata uses plugin-data JSON state with temp-file rename and a mkdir lock; binary cache writes use a plugin-data mkdir lock and reject archive paths outside the bin directory.
+- State location: `${CLAUDE_PLUGIN_DATA}/comment-checker/pending/<encoded-session>/<sha256(key)>.json` for pending metadata and `${CLAUDE_PLUGIN_DATA}/comment-checker/bin` for downloaded binaries.
+- Cross-process safety: pending metadata is stored as one JSON file per pending call so `take` removes one token atomically enough for non-security fail-open checks; binary cache writes use a plugin-data mkdir lock and reject archive paths outside the bin directory.
 - Lifecycle cleanup: `PreCompact` and `SessionEnd` prune pending calls for the session and release stale lock ownership when possible.
 - Stale-state cleanup: normal execution prunes pending calls older than `60_000` ms, cleans stale locks, and revalidates cached binary paths before use.
 
 ### Security and failure behavior
 
 - Safe default when input is invalid: skip capture/evaluation and emit no output.
-- Dependency/downstream failure behavior: checker download failure plus no `COMMENT_CHECKER_COMMAND` and no checker on `PATH` is a no-op; debug detail is emitted only when `HOOK_PACK_DEBUG=1`.
+- Dependency/downstream failure behavior: checker download failure plus no `COMMENT_CHECKER_COMMAND` and no checker on `PATH` is a no-op; default upstream release downloads use hardcoded SHA-256 pins for supported v0.7.0 tar.gz assets and digest mismatches fail open without writing the cache; debug detail is emitted only when `HOOK_PACK_DEBUG=1`.
 - Timeout behavior: dispatcher registry timeout is fail-closed; hook-owned resolver/download/runner timeouts are fail-open only as listed here and must be covered by tests.
 - Path validation: all pending paths are canonicalized under the current workspace when available; download/extract writes stay under `${CLAUDE_PLUGIN_DATA}/comment-checker/bin` and reject absolute paths, parent traversal, links, and non-regular archive entries.
 - Failure output shape: unavailable checker paths return no blocking decision; checker findings return `stopDecision: "block"`; unexpected hook errors fail open with no findings unless the dispatcher timeout terminates the hook.
 
 ### Tests required before implementation
 
-- Red test names: pending call capture/evaluation, checker exit code mapping, lazy resolver fail-open behavior, plugin-data download path safety, and apply_patch parity only after Task 7 Step 0 evidence.
-- Reference test ports: `tests/hooks/comment-checker.test.ts` (cross-port of `docs/reference/hooks/comment-checker/hook.apply-patch.test.ts` when runtime evidence permits and `docs/reference/hooks/comment-checker/hook.lazy-init.test.ts`), `tests/hooks/comment-checker-runner.test.ts` (port of `docs/reference/hooks/comment-checker/cli.test.ts`), `tests/hooks/comment-checker-pending-store.test.ts` (port of `docs/reference/hooks/comment-checker/pending-calls.test.ts`), `tests/hooks/comment-checker-downloader.test.ts` (new downloader safety coverage for `docs/reference/hooks/comment-checker/downloader.ts`).
+- Red test names: pending call capture/evaluation, checker exit code mapping, lazy resolver fail-open behavior, plugin-data download path safety, and explicit apply-patch omission after inconclusive Step 0 evidence.
+- Reference test ports: `tests/hooks/comment-checker.test.ts` (adapted coverage from `docs/reference/hooks/comment-checker/hook.ts`, `hook.lazy-init.test.ts`, and `hook.apply-patch.test.ts`, with apply-patch cases omitted per `docs/architecture/comment-checker-apply-patch-verification.md`), `tests/hooks/comment-checker-runner.test.ts` (adapted coverage from `docs/reference/hooks/comment-checker/cli.ts`, `cli-runner.ts`, and `cli.test.ts`), `tests/hooks/comment-checker-pending-store.test.ts` (adapted coverage from `docs/reference/hooks/comment-checker/pending-calls.ts` and `pending-calls.test.ts`), `tests/hooks/comment-checker-downloader.test.ts` (adapted downloader safety coverage from `docs/reference/hooks/comment-checker/downloader.ts`).
 - Edge cases: failed post-tool output, missing path, same-path concurrent edits, expired pending calls, unavailable command, downloader archive traversal, non-zero checker exits other than `2`, and inconclusive apply_patch metadata.
 - Validator checks: record header, stable ID, portable decision, reference source, state/lifecycle, tests, and neutrality sections must exist before registry entry validation passes.
 
@@ -147,7 +147,7 @@ Date: 2026-04-26
 ### Gate result
 
 - May enter BUILT_IN_REGISTRY: yes
-- Follow-up work: Task 7 Step 0 must record compatible Claude runtime evidence before applying apply_patch parity; otherwise apply-patch cases remain dropped/non-portable.
+- Follow-up work: none for Task 7; apply-patch cases remain dropped/non-portable until a future runtime contract explicitly documents compatible before/after metadata.
 
 ## Migration Feasibility Record: directory-agents-injector
 

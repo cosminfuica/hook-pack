@@ -27,6 +27,13 @@ export interface RegistrySelection {
 
 export const BUILT_IN_REGISTRY: readonly RegistryEntry[] = [
   {
+    id: "comment-checker",
+    events: ["PreToolUse", "PostToolUse", "PreCompact", "SessionEnd"],
+    runner: { kind: "internal", handlerId: "comment-checker" },
+    timeoutMs: 8000,
+    defaultEnabled: true
+  },
+  {
     id: "directory-agents-injector",
     events: ["PostToolUse", "PreCompact", "SessionEnd"],
     runner: { kind: "internal", handlerId: "directory-agents-injector" },
