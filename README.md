@@ -4,15 +4,15 @@ Hook Pack is a Claude Code plugin foundation for native hook automation. The fou
 
 ## Tier 1 governed hooks
 
-Tier 1 migration governance records cover these planned built-in hook IDs. Each hook becomes active only when its registry entry lands and remains configurable through the fields below.
+Tier 1 migration governance records cover these built-in hook IDs. Each hook has a default-enabled registry entry and remains configurable through the fields below.
 
-| Hook ID | Event mapping | Planned default | Purpose |
+| Hook ID | Event mapping | Default | Purpose |
 | --- | --- | --- | --- |
-| `comment-checker` | `PreToolUse`, `PostToolUse`, `PreCompact`, `SessionEnd` | enabled after registry entry lands | Detects unnecessary comments after write/edit-style tools when a checker command or downloaded binary is available; findings block continuation so the agent fixes them. |
-| `directory-agents-injector` | `PostToolUse`, `PreCompact`, `SessionEnd` | enabled after registry entry lands | Injects nested `AGENTS.md` context after successful `Read` results and clears dedupe on lifecycle cleanup. |
-| `directory-readme-injector` | `PostToolUse`, `PreCompact`, `SessionEnd` | enabled after registry entry lands | Injects relevant `README.md` context after successful `Read` results and clears dedupe on lifecycle cleanup. |
-| `rules-injector` | `PostToolUse`, `PreCompact`, `SessionEnd` | enabled after registry entry lands | Injects matching project rule files (`.github/instructions`, `.cursor/rules`, `.claude/rules`) after successful file read/write/edit tools and clears dedupe/cache on lifecycle cleanup. |
-| `write-existing-file-guard` | `PreToolUse`, `PostToolUse`, `PreCompact`, `SessionEnd` | enabled after registry entry lands | Blocks unsafe `Write` overwrites until the file has been read successfully in the same session. |
+| `comment-checker` | `PreToolUse`, `PostToolUse`, `PreCompact`, `SessionEnd` | default enabled | Detects unnecessary comments after write/edit-style tools when a checker command or downloaded binary is available; findings block continuation so the agent fixes them. |
+| `directory-agents-injector` | `PostToolUse`, `PreCompact`, `SessionEnd` | default enabled | Injects nested `AGENTS.md` context after successful `Read` results and clears dedupe on lifecycle cleanup. |
+| `directory-readme-injector` | `PostToolUse`, `PreCompact`, `SessionEnd` | default enabled | Injects relevant `README.md` context after successful `Read` results and clears dedupe on lifecycle cleanup. |
+| `rules-injector` | `PostToolUse`, `PreCompact`, `SessionEnd` | default enabled | Injects matching project rule files (`.github/instructions`, `.cursor/rules`, `.claude/rules`) after successful file read/write/edit tools and clears dedupe/cache on lifecycle cleanup. |
+| `write-existing-file-guard` | `PreToolUse`, `PostToolUse`, `PreCompact`, `SessionEnd` | default enabled | Blocks unsafe `Write` overwrites until the file has been read successfully in the same session. |
 
 ### Plugin user configuration
 

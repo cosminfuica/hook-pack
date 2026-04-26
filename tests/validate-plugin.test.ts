@@ -130,6 +130,29 @@ function governanceRecordForImplementedHook(sections: readonly string[]): string
   ].join("\n");
 }
 
+function governanceRecord(parts: {
+  readonly header?: string | undefined;
+  readonly stableId?: string | undefined;
+  readonly decision?: string | undefined;
+  readonly sections?: readonly string[] | undefined;
+}): string {
+  return [
+    "# Migration Governance",
+    "",
+    parts.header ?? "## Migration Feasibility Record: implemented-hook",
+    "",
+    parts.stableId ?? "Stable ID: implemented-hook",
+    parts.decision ?? "Decision: portable",
+    "",
+    ...(parts.sections ?? [
+      "### Reference source",
+      "### State and lifecycle",
+      "### Tests required before implementation",
+      "### Orchestration neutrality"
+    ]).flatMap((section) => [section, ""])
+  ].join("\n");
+}
+
 describe("plugin validator", () => {
   it("accepts the foundation plugin scaffold", async () => {
     const result = await runValidator(validatorPath, repoRoot);
@@ -234,28 +257,40 @@ describe("plugin validator", () => {
   });
 
   it("fails when implemented registry governance records lack required sections", async () => {
-    const requiredSections = [
-      "### Reference source",
-      "### State and lifecycle",
-      "### Tests required before implementation",
-      "### Orchestration neutrality"
-    ];
-    await withFixture(
+    const requiredSections = ["### Reference source", "### State and lifecycle", "### Tests required before implementation", "### Orchestration neutrality"];
+    const missingCases = [
       {
-        registrySource: implementedHookRegistrySource,
-        governanceSource: governanceRecordForImplementedHook(requiredSections.filter((section) => section !== "### State and lifecycle"))
+        governanceSource: governanceRecord({ stableId: "Stable ID: other-hook" }),
+        expected: "Stable ID: implemented-hook"
       },
-      async (root) => {
-        const result = await runValidator(resolve(root, "scripts", "validate-plugin.mjs"), root);
+      {
+        governanceSource: governanceRecord({ decision: "Decision: redesign-needed" }),
+        expected: "Decision: portable"
+      },
+      ...requiredSections.map((section) => ({
+        governanceSource: governanceRecord({ sections: requiredSections.filter((candidate) => candidate !== section) }),
+        expected: section
+      }))
+    ];
 
-        assert.notEqual(result.exitCode, 0);
-        assert.equal(result.stdout, "");
-        assert.match(
-          result.stderr,
-          /^- migration governance record for implemented-hook must include ### State and lifecycle/m
-        );
-      }
-    );
+    for (const { governanceSource, expected } of missingCases) {
+      await withFixture(
+        {
+          registrySource: implementedHookRegistrySource,
+          governanceSource
+        },
+        async (root) => {
+          const result = await runValidator(resolve(root, "scripts", "validate-plugin.mjs"), root);
+
+          assert.notEqual(result.exitCode, 0);
+          assert.equal(result.stdout, "");
+          assert.match(
+            result.stderr,
+            new RegExp(`^- migration governance record for implemented-hook must include ${escapeRegExp(expected)}`, "m")
+          );
+        }
+      );
+    }
 
     await withFixture(
       {
@@ -271,4 +306,24 @@ describe("plugin validator", () => {
       }
     );
   });
+
+  it("fails when implemented registry governance record header is missing", async () => {
+    await withFixture(
+      {
+        registrySource: implementedHookRegistrySource,
+        governanceSource: governanceRecord({ header: "## Migration Feasibility Record: other-hook" })
+      },
+      async (root) => {
+        const result = await runValidator(resolve(root, "scripts", "validate-plugin.mjs"), root);
+
+        assert.notEqual(result.exitCode, 0);
+        assert.equal(result.stdout, "");
+        assert.match(result.stderr, /^- migration governance docs must include ## Migration Feasibility Record: implemented-hook/m);
+      }
+    );
+  });
 });
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}

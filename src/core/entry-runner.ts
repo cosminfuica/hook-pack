@@ -149,13 +149,12 @@ function readPermissionDecision(value: Record<string, unknown>): PermissionDecis
   if (
     permissionDecision === "allow" ||
     permissionDecision === "ask" ||
-    permissionDecision === "deny" ||
-    permissionDecision === "defer"
+    permissionDecision === "deny"
   ) {
     return permissionDecision;
   }
 
-  throw new Error("permissionDecision must be allow, ask, deny, or defer");
+  throw new Error("permissionDecision must be allow, ask, or deny");
 }
 
 function readStopDecision(value: Record<string, unknown>): StopDecision | undefined {

@@ -1,6 +1,6 @@
 import type { SupportedEventName } from "./events.js";
 
-export type PermissionDecision = "allow" | "ask" | "deny" | "defer";
+export type PermissionDecision = "allow" | "ask" | "deny";
 export type StopDecision = "pass" | "block";
 
 export interface HookExecutionResult {
@@ -28,7 +28,6 @@ export interface ClaudeHookOutput {
 const PERMISSION_PRIORITY: Record<PermissionDecision, number> = {
   deny: 4,
   ask: 3,
-  defer: 2,
   allow: 1
 };
 

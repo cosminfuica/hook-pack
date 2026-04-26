@@ -8,19 +8,18 @@ describe("hook output contracts", () => {
     assert.deepEqual(combineHookResults("PreToolUse", []), {});
   });
 
-  it("resolves PreToolUse permission conflicts as deny then ask then defer then allow", () => {
+  it("resolves PreToolUse permission conflicts as deny then ask then allow", () => {
     const cases: Array<{
       name: string;
       results: Parameters<typeof combineHookResults>[1];
       expected: ReturnType<typeof combineHookResults>;
     }> = [
       {
-        name: "deny beats ask, defer, and allow",
+        name: "deny beats ask and allow",
         results: [
           { hookId: "z-allow", permissionDecision: "allow", message: "allow message" },
           { hookId: "b-ask", permissionDecision: "ask", message: "ask message" },
-          { hookId: "a-deny", permissionDecision: "deny", message: "deny message", updatedInput: { command: "safe" } },
-          { hookId: "c-defer", permissionDecision: "defer", message: "defer message" }
+          { hookId: "a-deny", permissionDecision: "deny", message: "deny message", updatedInput: { command: "safe" } }
         ],
         expected: {
           hookSpecificOutput: {
@@ -33,11 +32,10 @@ describe("hook output contracts", () => {
         }
       },
       {
-        name: "ask beats defer and allow",
+        name: "ask beats allow",
         results: [
           { hookId: "z-allow", permissionDecision: "allow", message: "allow message" },
-          { hookId: "b-ask", permissionDecision: "ask", message: "ask message" },
-          { hookId: "c-defer", permissionDecision: "defer", message: "defer message" }
+          { hookId: "b-ask", permissionDecision: "ask", message: "ask message" }
         ],
         expected: {
           hookSpecificOutput: {
@@ -46,21 +44,6 @@ describe("hook output contracts", () => {
             permissionDecisionReason: "ask message"
           },
           systemMessage: "b-ask: ask message"
-        }
-      },
-      {
-        name: "defer beats allow",
-        results: [
-          { hookId: "z-allow", permissionDecision: "allow", message: "allow message" },
-          { hookId: "c-defer", permissionDecision: "defer", message: "defer message" }
-        ],
-        expected: {
-          hookSpecificOutput: {
-            hookEventName: "PreToolUse",
-            permissionDecision: "defer",
-            permissionDecisionReason: "defer message"
-          },
-          systemMessage: "c-defer: defer message"
         }
       },
       {
