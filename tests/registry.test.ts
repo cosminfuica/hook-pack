@@ -33,7 +33,11 @@ describe("hook registry", () => {
   };
 
   it("registers implemented Tier 1 hooks in current migration order", () => {
-    assert.deepEqual(BUILT_IN_REGISTRY.map((entry) => entry.id), ["write-existing-file-guard"]);
+    assert.deepEqual(BUILT_IN_REGISTRY.map((entry) => entry.id), [
+      "directory-agents-injector",
+      "directory-readme-injector",
+      "write-existing-file-guard"
+    ]);
   });
 
   it("sorts diagnostics by optional hook ID and code", () => {

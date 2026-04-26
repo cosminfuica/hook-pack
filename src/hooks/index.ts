@@ -1,7 +1,11 @@
+import { createDirectoryAgentsInjector } from "./directory-agents-injector/index.js";
+import { createDirectoryReadmeInjector } from "./directory-readme-injector/index.js";
 import { createWriteExistingFileGuard } from "./write-existing-file-guard/index.js";
 import type { BuiltInHookHandlers } from "./types.js";
 
 export const BUILT_IN_HOOK_HANDLERS: BuiltInHookHandlers = {
+  "directory-agents-injector": createDirectoryAgentsInjector(),
+  "directory-readme-injector": createDirectoryReadmeInjector(),
   "write-existing-file-guard": createWriteExistingFileGuard()
 };
 

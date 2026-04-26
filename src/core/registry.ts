@@ -27,6 +27,20 @@ export interface RegistrySelection {
 
 export const BUILT_IN_REGISTRY: readonly RegistryEntry[] = [
   {
+    id: "directory-agents-injector",
+    events: ["PostToolUse", "PreCompact", "SessionEnd"],
+    runner: { kind: "internal", handlerId: "directory-agents-injector" },
+    timeoutMs: 3000,
+    defaultEnabled: true
+  },
+  {
+    id: "directory-readme-injector",
+    events: ["PostToolUse", "PreCompact", "SessionEnd"],
+    runner: { kind: "internal", handlerId: "directory-readme-injector" },
+    timeoutMs: 3000,
+    defaultEnabled: true
+  },
+  {
     id: "write-existing-file-guard",
     events: ["PreToolUse", "PostToolUse", "PreCompact", "SessionEnd"],
     runner: { kind: "internal", handlerId: "write-existing-file-guard" },
