@@ -16,7 +16,9 @@ describe("hook registry", () => {
     enabled: true,
     enableAllHooksByDefault: false,
     enabledHooks: [],
-    disabledHooks: []
+    disabledHooks: [],
+    maxContextChars: 20_000,
+    includeUserRules: false
   };
 
   const baseEnvelope: HookEnvelope = {
@@ -164,7 +166,9 @@ describe("hook registry", () => {
       enabled: false,
       enableAllHooksByDefault: true,
       enabledHooks: ["missing-enabled"],
-      disabledHooks: ["missing-disabled"]
+      disabledHooks: ["missing-disabled"],
+      maxContextChars: 20_000,
+      includeUserRules: false
     };
 
     assert.deepEqual(selectRegistryEntries(registry, baseEnvelope, config), {
@@ -181,7 +185,9 @@ describe("hook registry", () => {
       enabled: false,
       enableAllHooksByDefault: true,
       enabledHooks: ["default-disabled"],
-      disabledHooks: []
+      disabledHooks: [],
+      maxContextChars: 20_000,
+      includeUserRules: false
     };
 
     assert.deepEqual(selectRegistryEntries(registry, baseEnvelope, globallyDisabledConfig), {

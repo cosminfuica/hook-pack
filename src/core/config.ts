@@ -6,6 +6,8 @@ export interface HookPackConfig {
   readonly enableAllHooksByDefault: boolean;
   readonly enabledHooks: readonly string[];
   readonly disabledHooks: readonly string[];
+  readonly maxContextChars: number;
+  readonly includeUserRules: boolean;
 }
 
 export interface PartialHookPackConfig {
@@ -13,21 +15,33 @@ export interface PartialHookPackConfig {
   readonly enableAllHooksByDefault?: boolean | undefined;
   readonly enabledHooks?: readonly string[] | undefined;
   readonly disabledHooks?: readonly string[] | undefined;
+  readonly maxContextChars?: number | undefined;
+  readonly includeUserRules?: boolean | undefined;
 }
 
 export interface ConfigEnvironment {
   readonly CLAUDE_PLUGIN_OPTION_ENABLED_HOOKS?: string | undefined;
   readonly CLAUDE_PLUGIN_OPTION_DISABLED_HOOKS?: string | undefined;
   readonly CLAUDE_PLUGIN_OPTION_ENABLE_ALL_HOOKS_BY_DEFAULT?: string | undefined;
+  readonly CLAUDE_PLUGIN_OPTION_MAX_CONTEXT_CHARS?: string | undefined;
+  readonly CLAUDE_PLUGIN_OPTION_INCLUDE_USER_RULES?: string | undefined;
 }
 
-type FrontmatterKey = "enabled" | "enable_all_hooks_by_default" | "enabled_hooks" | "disabled_hooks";
+type FrontmatterKey =
+  | "enabled"
+  | "enable_all_hooks_by_default"
+  | "enabled_hooks"
+  | "disabled_hooks"
+  | "max_context_chars"
+  | "include_user_rules";
 
 export const DEFAULT_CONFIG: HookPackConfig = {
   enabled: true,
   enableAllHooksByDefault: false,
   enabledHooks: [],
-  disabledHooks: []
+  disabledHooks: [],
+  maxContextChars: 20_000,
+  includeUserRules: false
 };
 
 export function parseHookList(value: string | undefined): string[] {
@@ -52,7 +66,9 @@ export function mergeConfig(base: HookPackConfig, override: PartialHookPackConfi
     enabled: override.enabled ?? base.enabled,
     enableAllHooksByDefault: override.enableAllHooksByDefault ?? base.enableAllHooksByDefault,
     enabledHooks: override.enabledHooks !== undefined ? dedupeHookIds(override.enabledHooks) : base.enabledHooks,
-    disabledHooks: override.disabledHooks !== undefined ? dedupeHookIds(override.disabledHooks) : base.disabledHooks
+    disabledHooks: override.disabledHooks !== undefined ? dedupeHookIds(override.disabledHooks) : base.disabledHooks,
+    maxContextChars: override.maxContextChars ?? base.maxContextChars,
+    includeUserRules: override.includeUserRules ?? base.includeUserRules
   };
 }
 
@@ -74,6 +90,16 @@ export function readEnvironmentConfig(environment: ConfigEnvironment = process.e
   );
   if (enableAllHooksByDefault !== undefined) {
     config.enableAllHooksByDefault = enableAllHooksByDefault;
+  }
+
+  const maxContextChars = parsePositiveIntegerValue(environment.CLAUDE_PLUGIN_OPTION_MAX_CONTEXT_CHARS);
+  if (maxContextChars !== undefined) {
+    config.maxContextChars = maxContextChars;
+  }
+
+  const includeUserRules = parseBooleanValue(environment.CLAUDE_PLUGIN_OPTION_INCLUDE_USER_RULES);
+  if (includeUserRules !== undefined) {
+    config.includeUserRules = includeUserRules;
   }
 
   return config;
@@ -108,6 +134,16 @@ export function parseProjectLocalFrontmatter(markdown: string): PartialHookPackC
     config.disabledHooks = disabledHooks;
   }
 
+  const maxContextChars = parsePositiveIntegerValue(fields.max_context_chars);
+  if (maxContextChars !== undefined) {
+    config.maxContextChars = maxContextChars;
+  }
+
+  const includeUserRules = parseBooleanValue(fields.include_user_rules);
+  if (includeUserRules !== undefined) {
+    config.includeUserRules = includeUserRules;
+  }
+
   return config;
 }
 
@@ -130,6 +166,8 @@ interface MutablePartialHookPackConfig {
   enableAllHooksByDefault?: boolean | undefined;
   enabledHooks?: readonly string[] | undefined;
   disabledHooks?: readonly string[] | undefined;
+  maxContextChars?: number | undefined;
+  includeUserRules?: boolean | undefined;
 }
 
 function extractFrontmatter(markdown: string): string | undefined {
@@ -153,7 +191,9 @@ function parseFrontmatterFields(frontmatter: string): Record<FrontmatterKey, str
     enabled: undefined,
     enable_all_hooks_by_default: undefined,
     enabled_hooks: undefined,
-    disabled_hooks: undefined
+    disabled_hooks: undefined,
+    max_context_chars: undefined,
+    include_user_rules: undefined
   };
 
   for (const line of frontmatter.split("\n")) {
@@ -195,6 +235,24 @@ function parseBooleanValue(value: string | undefined): boolean | undefined {
   return undefined;
 }
 
+function parsePositiveIntegerValue(value: string | undefined): number | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const normalizedValue = cleanScalarValue(value);
+  if (!/^\d+$/.test(normalizedValue)) {
+    return undefined;
+  }
+
+  const parsedValue = Number.parseInt(normalizedValue, 10);
+  if (Number.isNaN(parsedValue) || parsedValue < 1) {
+    return undefined;
+  }
+
+  return parsedValue;
+}
+
 function cleanScalarValue(value: string): string {
   const trimmedValue = value.trim();
   if (trimmedValue.length < 2) {
@@ -232,6 +290,8 @@ function isFrontmatterKey(value: string): value is FrontmatterKey {
     value === "enabled" ||
     value === "enable_all_hooks_by_default" ||
     value === "enabled_hooks" ||
-    value === "disabled_hooks"
+    value === "disabled_hooks" ||
+    value === "max_context_chars" ||
+    value === "include_user_rules"
   );
 }

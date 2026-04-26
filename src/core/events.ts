@@ -39,7 +39,8 @@ export const REGISTERED_DISPATCH_EVENTS = [
   "Stop",
   "SubagentStop",
   "PreCompact",
-  "Notification"
+  "Notification",
+  "SessionEnd"
 ] as const;
 
 export type SupportedEventName = (typeof SUPPORTED_EVENTS)[number];

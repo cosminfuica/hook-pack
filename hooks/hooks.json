@@ -88,6 +88,17 @@
           }
         ]
       }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.sh\" SessionEnd",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }

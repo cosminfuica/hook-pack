@@ -110,7 +110,8 @@ describe("event adapter contracts", () => {
       "Stop",
       "SubagentStop",
       "PreCompact",
-      "Notification"
+      "Notification",
+      "SessionEnd"
     ]);
   });
 

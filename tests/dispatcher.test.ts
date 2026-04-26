@@ -12,7 +12,9 @@ describe("dispatcher core", () => {
     enabled: true,
     enableAllHooksByDefault: false,
     enabledHooks: [],
-    disabledHooks: []
+    disabledHooks: [],
+    maxContextChars: 20_000,
+    includeUserRules: false
   };
 
   it("returns empty output when no entries are enabled", async () => {

@@ -1,8 +1,11 @@
 import { loadConfig } from "../core/config.js";
 import { dispatchHookEvent } from "../core/dispatcher.js";
-import { HookInputError, type HookEnvelope, normalizeHookInput } from "../core/events.js";
-import type { ClaudeHookOutput, HookExecutionResult } from "../core/output.js";
-import { BUILT_IN_REGISTRY, type RegistryEntry } from "../core/registry.js";
+import { executeRegistryEntry } from "../core/entry-runner.js";
+import { HookInputError, normalizeHookInput } from "../core/events.js";
+import type { ClaudeHookOutput } from "../core/output.js";
+import { resolveRuntimeContext } from "../core/runtime-context.js";
+import { BUILT_IN_REGISTRY } from "../core/registry.js";
+import { getBuiltInHookHandler } from "../hooks/index.js";
 
 main().catch((error: unknown) => {
   writeError(error);
@@ -13,12 +16,21 @@ async function main(): Promise<void> {
   const rawInput = await readStdin();
   const parsedInput = JSON.parse(rawInput) as unknown;
   const envelope = normalizeHookInput(parsedInput, process.argv[2]);
-  const config = loadConfig(envelope.cwd);
+  const config = loadConfig(envelope.cwd, process.env);
+  const runtimeContext = resolveRuntimeContext(envelope.cwd, process.env, Date.now, {
+    maxContextChars: config.maxContextChars,
+    includeUserRules: config.includeUserRules
+  });
   const output = await dispatchHookEvent({
     envelope,
     entries: BUILT_IN_REGISTRY,
     config,
-    execute: executeRegisteredEntry
+    execute: (entry, currentEnvelope) => executeRegistryEntry({
+      entry,
+      envelope: currentEnvelope,
+      runtimeContext,
+      resolveBuiltInHookHandler: getBuiltInHookHandler
+    })
   });
 
   writeOutput(output);
@@ -37,32 +49,6 @@ function readStdin(): Promise<string> {
       resolve(input);
     });
   });
-}
-
-async function executeRegisteredEntry(entry: RegistryEntry, envelope: HookEnvelope): Promise<HookExecutionResult> {
-  const message = `hook ${entry.id} cannot execute during foundation phase`;
-
-  switch (envelope.eventName) {
-    case "PreToolUse":
-      return {
-        hookId: entry.id,
-        permissionDecision: "deny",
-        message
-      };
-    case "Stop":
-    case "SubagentStop":
-    case "PostToolUse":
-      return {
-        hookId: entry.id,
-        stopDecision: "block",
-        message
-      };
-    default:
-      return {
-        hookId: entry.id,
-        additionalContext: message
-      };
-  }
 }
 
 function writeOutput(output: ClaudeHookOutput): void {

@@ -22,6 +22,19 @@
       "type": "boolean",
       "title": "Enable all hooks by default",
       "description": "When true, every implemented hook defaults to enabled unless listed in disabled_hooks."
+    },
+    "max_context_chars": {
+      "type": "number",
+      "title": "Maximum context characters",
+      "description": "Maximum number of context characters that context-producing hooks may add.",
+      "default": 20000,
+      "min": 1000
+    },
+    "include_user_rules": {
+      "type": "boolean",
+      "title": "Include user rules",
+      "description": "When true, later rules-injection hooks may include user-level rules in generated context.",
+      "default": false
     }
   }
 }

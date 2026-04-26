@@ -32,6 +32,17 @@ describe("plugin scaffold", () => {
     assertRecord(manifest.userConfig.enabled_hooks, "enabled_hooks config");
     assertRecord(manifest.userConfig.disabled_hooks, "disabled_hooks config");
     assertRecord(manifest.userConfig.enable_all_hooks_by_default, "enable_all_hooks_by_default config");
+
+    const maxContextCharsConfig = manifest.userConfig.max_context_chars;
+    assertRecord(maxContextCharsConfig, "max_context_chars config");
+    assert.equal(maxContextCharsConfig.type, "number");
+    assert.equal(maxContextCharsConfig.default, 20_000);
+    assert.equal(maxContextCharsConfig.min, 1_000);
+
+    const includeUserRulesConfig = manifest.userConfig.include_user_rules;
+    assertRecord(includeUserRulesConfig, "include_user_rules config");
+    assert.equal(includeUserRulesConfig.type, "boolean");
+    assert.equal(includeUserRulesConfig.default, false);
   });
 
   it("registers native Claude Code hook events through the plugin hooks wrapper", () => {
@@ -49,7 +60,8 @@ describe("plugin scaffold", () => {
       "Stop",
       "SubagentStop",
       "PreCompact",
-      "Notification"
+      "Notification",
+      "SessionEnd"
     ];
 
     for (const eventName of eventNames) {
