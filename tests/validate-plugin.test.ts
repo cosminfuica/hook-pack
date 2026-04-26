@@ -63,7 +63,7 @@ function createFixture(options: FixtureOptions = {}): string {
   mkdirSync(resolve(root, ".claude-plugin"), { recursive: true });
   mkdirSync(resolve(root, "hooks"), { recursive: true });
   mkdirSync(resolve(root, "scripts"), { recursive: true });
-  mkdirSync(resolve(root, "dist", "src", "cli"), { recursive: true });
+  mkdirSync(resolve(root, "dist"), { recursive: true });
   mkdirSync(resolve(root, "dist", "src", "core"), { recursive: true });
 
   writeJson(resolve(root, ".claude-plugin", "plugin.json"), {
@@ -90,7 +90,7 @@ function createFixture(options: FixtureOptions = {}): string {
   chmodSync(resolve(root, "hooks", "dispatch.sh"), 0o755);
   writeFileSync(resolve(root, "scripts", "validate-plugin.mjs"), validatorSource, "utf8");
   if (options.runtimeArtifact !== false) {
-    writeFileSync(resolve(root, "dist", "src", "cli", "dispatch.js"), "export {};\n", "utf8");
+    writeFileSync(resolve(root, "dist", "hook-pack-dispatch.mjs"), "export {};\n", "utf8");
   }
   writeFileSync(
     resolve(root, "dist", "src", "core", "registry.js"),
@@ -168,7 +168,7 @@ describe("plugin validator", () => {
 
       assert.notEqual(result.exitCode, 0);
       assert.equal(result.stdout, "");
-      assert.match(result.stderr, /^- runtime dispatch artifact must exist at dist\/src\/cli\/dispatch\.js/m);
+      assert.match(result.stderr, /^- runtime dispatch artifact must exist at dist\/hook-pack-dispatch\.mjs/m);
     });
   });
 

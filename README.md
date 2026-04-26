@@ -1,82 +1,46 @@
 # Hook Pack
 
-Hook Pack is a Claude Code plugin foundation for native hook automation. The foundation includes the plugin scaffold, dispatcher, config loader, registry selection, validation, and docs for governed built-in hook migration.
+Claude Code plugin shipping five default-enabled hooks: `comment-checker`, `directory-agents-injector`, `directory-readme-injector`, `rules-injector`, `write-existing-file-guard`.
 
-## Tier 1 governed hooks
+## Install
 
-Tier 1 migration governance records cover these built-in hook IDs. Each hook has a default-enabled registry entry and remains configurable through the fields below.
+In Claude Code:
 
-| Hook ID | Event mapping | Default | Purpose |
-| --- | --- | --- | --- |
-| `comment-checker` | `PreToolUse`, `PostToolUse`, `PreCompact`, `SessionEnd` | default enabled | Detects unnecessary comments after write/edit-style tools when a checker command or downloaded binary is available; findings block continuation so the agent fixes them. |
-| `directory-agents-injector` | `PostToolUse`, `PreCompact`, `SessionEnd` | default enabled | Injects nested `AGENTS.md` context after successful `Read` results and clears dedupe on lifecycle cleanup. |
-| `directory-readme-injector` | `PostToolUse`, `PreCompact`, `SessionEnd` | default enabled | Injects relevant `README.md` context after successful `Read` results and clears dedupe on lifecycle cleanup. |
-| `rules-injector` | `PostToolUse`, `PreCompact`, `SessionEnd` | default enabled | Injects matching project rule files (`.github/instructions`, `.cursor/rules`, `.claude/rules`) after successful file read/write/edit tools and clears dedupe/cache on lifecycle cleanup. |
-| `write-existing-file-guard` | `PreToolUse`, `PostToolUse`, `PreCompact`, `SessionEnd` | default enabled | Blocks unsafe `Write` overwrites until the file has been read successfully in the same session. |
+```
+/plugin marketplace add cosminfuica/hook-pack
+/plugin install hook-pack@cosminfuica
+```
 
-### Plugin user configuration
+Restart Claude Code, then `/hooks` to confirm the five hooks are registered. All five are enabled by default.
 
-| Field | Type | Default | Meaning |
-| --- | --- | --- | --- |
-| `enabled_hooks` | comma-separated string | empty | Hook IDs to enable beyond defaults. |
-| `disabled_hooks` | comma-separated string | empty | Hook IDs to disable; always wins. |
-| `enable_all_hooks_by_default` | boolean | `false` | When `true`, enables every implemented registry hook unless disabled. |
-| `max_context_chars` | number | `20000` | Fallback truncation limit when no model context window is detected. |
-| `include_user_rules` | boolean | `false` | When `true`, scan `~/.claude/rules`, `~/.cursor/rules`, `~/.github/instructions` for project-wide rules. |
-
-Disable one hook locally via `.claude/hook-pack.local.md`:
+Override per project in `.claude/hook-pack.local.md` (gitignored):
 
 ```markdown
 ---
-enabled: true
 disabled_hooks: write-existing-file-guard
+include_user_rules: true
+max_context_chars: 30000
 ---
 ```
 
-`PreCompact` and `SessionEnd` cleanup remove per-session plugin-data state when those events fire so directory/rule context can be re-injected after compaction and stale read permissions do not survive known session boundaries. Each stateful hook also runs opportunistic stale-state cleanup during normal execution because `SessionEnd` is not guaranteed for every normal exit.
+Available fields: `enabled_hooks`, `disabled_hooks`, `enable_all_hooks_by_default`, `max_context_chars` (default `20000`), `include_user_rules` (default `false`).
 
-## Development commands
+Per-session state (read tokens, dedupe caches, pending checker calls) is cleared on `PreCompact` and `SessionEnd`, plus opportunistically during normal hook execution.
 
-Run from the plugin root:
+## Contributing
+
+Requires Node 20+.
 
 ```bash
 npm install
-npm run build
+npm run build         # tsc + esbuild bundle
 npm run typecheck
-npm test
+npm test              # builds, then runs node --test dist/tests/**/*.test.js
 npm run validate:plugin
 ```
 
-`npm test` builds TypeScript first, then runs the compiled Node test suite under `dist/tests/**/*.test.js`.
+All four must pass before opening a PR. After any source change touching runtime code, **rebuild and commit `dist/hook-pack-dispatch.mjs`** so `/plugin install` keeps working from a fresh clone.
 
-## Local Claude Code build and run
+New built-in hooks need a complete Migration Feasibility Record in `docs/architecture/migration-governance.md` before being added to `BUILT_IN_REGISTRY`. See `docs/architecture/hook-pack-foundation.md` for the runtime architecture.
 
-Build before testing the plugin locally:
-
-```bash
-npm run build
-```
-
-Claude Code loads plugin hooks from `hooks/hooks.json`. Each registered native event calls the wrapper script:
-
-```bash
-bash "${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.sh" PreToolUse
-```
-
-For a local run, install or enable this directory as a Claude Code plugin, restart Claude Code so hooks are loaded, then use `/hooks` or debug mode to inspect registrations. The wrapper requires `${CLAUDE_PLUGIN_ROOT}` so installed plugin paths stay portable across machines.
-
-## User configuration
-
-Hook Pack reads Claude Code plugin options and project-local settings. Project-local settings live in `.claude/hook-pack.local.md`. Keep this file local to your project. The repository `.gitignore` excludes `.claude/*.local.md` and `.claude/*.local.json`.
-
-Do not place API keys, tokens, credentials, private URLs, or other secrets in local config. Hook Pack config controls hook selection only.
-
-## State and data
-
-Runtime state must be stored outside the plugin source tree. Use `${CLAUDE_PLUGIN_DATA}` for plugin-owned state when a hook needs cache files, migration records, or generated runtime data. Source files, docs, and registry code stay immutable at runtime.
-
-## Migration governance status
-
-Built-in hooks enter the runtime only after migration feasibility records document native Claude Code event mapping, state rules, lifecycle cleanup, failure behavior, tests, and orchestration neutrality.
-
-See `docs/architecture/hook-pack-foundation.md` and `docs/architecture/migration-governance.md` before adding runtime hook behavior.
+Runtime state lives under `${CLAUDE_PLUGIN_DATA}` only. Shipped sources must contain no orchestration-specific identifiers; `tests/orchestration-neutrality.test.ts` enforces this.

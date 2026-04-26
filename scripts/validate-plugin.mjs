@@ -26,7 +26,7 @@ if (isRecord(hooksConfig)) {
 }
 
 validateExecutableFile("hooks/dispatch.sh", "hooks/dispatch.sh");
-validateFileExists("dist/src/cli/dispatch.js", "runtime dispatch artifact");
+validateFileExists("dist/hook-pack-dispatch.mjs", "runtime dispatch artifact");
 validateRegistryGovernance();
 
 if (errors.length > 0) {

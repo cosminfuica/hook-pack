@@ -1,0 +1,24 @@
+{
+  "name": "cosminfuica",
+  "owner": {
+    "name": "cosminfuica"
+  },
+  "metadata": {
+    "description": "cosminfuica's Claude Code plugin marketplace."
+  },
+  "plugins": [
+    {
+      "name": "hook-pack",
+      "source": {
+        "source": "github",
+        "repo": "cosminfuica/hook-pack"
+      },
+      "description": "Native Claude Code hook foundation with five default-enabled hooks: comment-checker, directory-agents-injector, directory-readme-injector, rules-injector, write-existing-file-guard.",
+      "homepage": "https://github.com/cosminfuica/hook-pack",
+      "repository": "https://github.com/cosminfuica/hook-pack",
+      "license": "MIT",
+      "keywords": ["claude-code", "hooks", "plugin", "policy", "automation"],
+      "category": "automation"
+    }
+  ]
+}

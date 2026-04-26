@@ -85,5 +85,5 @@ npm run validate:plugin
 ## NOTES
 
 - `npm test` runs `npm run build` first, then `node --test "dist/tests/**/*.test.js"`.
-- `npm run validate:plugin` builds first, then checks manifest JSON, hooks wrapper format, `hooks/dispatch.sh` executable bit, generated `dist/src/cli/dispatch.js`, `dist/src/core/registry.js`, and governance records.
+- `npm run validate:plugin` builds first, then checks manifest JSON, hooks wrapper format, `hooks/dispatch.sh` executable bit, bundled `dist/hook-pack-dispatch.mjs`, generated `dist/src/core/registry.js`, and governance records.
 - Claude Code docs currently list more hook events than Hook Pack registers. Hook Pack uses a governed subset; expand only through architecture docs, registry changes, tests, and validation.
