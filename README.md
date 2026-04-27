@@ -28,5 +28,3 @@ npm run validate:plugin
 ```
 
 All four must pass before opening a PR. After any source change touching runtime code, **rebuild and commit `dist/hook-pack-dispatch.mjs`** so `/plugin install` keeps working from a fresh clone.
-
-See [`docs/architecture/`](docs/architecture/) for runtime architecture, migration governance, and verification evidence.
