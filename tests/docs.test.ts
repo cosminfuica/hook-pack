@@ -19,12 +19,25 @@ function assertIncludes(source: string, expected: string, label: string): void {
 }
 
 describe("foundation documentation", () => {
-  it("documents user configuration requirements", () => {
+  it("README points users at install + configuration docs without enumerating hook IDs", () => {
     const readme = readRequiredDoc("README.md");
 
-    assertIncludes(readme, "enabled_hooks", "README.md");
-    assertIncludes(readme, "disabled_hooks", "README.md");
-    assertIncludes(readme, ".claude/hook-pack.local.md", "README.md");
+    assertIncludes(readme, "/plugin marketplace add", "README.md");
+    assertIncludes(readme, "/plugin install", "README.md");
+    assertIncludes(readme, "docs/configuration.md", "README.md");
+    assertIncludes(readme, "docs/architecture", "README.md");
+  });
+
+  it("documents user configuration requirements in docs/configuration.md", () => {
+    const config = readRequiredDoc("docs/configuration.md");
+
+    assertIncludes(config, "enabled_hooks", "docs/configuration.md");
+    assertIncludes(config, "disabled_hooks", "docs/configuration.md");
+    assertIncludes(config, ".claude/hook-pack.local.md", "docs/configuration.md");
+    assertIncludes(config, "include_user_rules", "docs/configuration.md");
+    assertIncludes(config, "max_context_chars", "docs/configuration.md");
+    assertIncludes(config, "PreCompact", "docs/configuration.md");
+    assertIncludes(config, "SessionEnd", "docs/configuration.md");
   });
 
   it("documents foundation runtime boundaries", () => {
@@ -43,7 +56,7 @@ describe("foundation documentation", () => {
   });
 
   it("documents Tier 1 migrated hook IDs, lifecycle cleanup, and neutrality posture", () => {
-    const readme = readRequiredDoc("README.md");
+    const config = readRequiredDoc("docs/configuration.md");
     const governance = readRequiredDoc("docs/architecture/migration-governance.md");
 
     for (const hookId of [
@@ -53,7 +66,7 @@ describe("foundation documentation", () => {
       "rules-injector",
       "write-existing-file-guard"
     ]) {
-      assertIncludes(readme, hookId, "README.md");
+      assertIncludes(config, hookId, "docs/configuration.md");
       const recordStart = governance.indexOf(`## Migration Feasibility Record: ${hookId}`);
       assert.notEqual(recordStart, -1, `migration governance docs must include record header for ${hookId}`);
       const nextRecordStart = governance.indexOf("## Migration Feasibility Record:", recordStart + 1);
@@ -66,10 +79,5 @@ describe("foundation documentation", () => {
       assertIncludes(record, "### State and lifecycle", `record state section for ${hookId}`);
       assertIncludes(record, "### Orchestration neutrality", `record neutrality section for ${hookId}`);
     }
-
-    assertIncludes(readme, "PreCompact", "README.md");
-    assertIncludes(readme, "SessionEnd", "README.md");
-    assertIncludes(readme, "include_user_rules", "README.md");
-    assertIncludes(readme, "max_context_chars", "README.md");
   });
 });
