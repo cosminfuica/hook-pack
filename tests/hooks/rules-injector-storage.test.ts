@@ -1,9 +1,8 @@
-// Ported from: docs/reference/hooks/rules-injector/storage.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - bun:test -> node:test/node:assert/strict
 // - RULES_INJECTOR_STORAGE global path -> CLAUDE_PLUGIN_DATA/rules-injector/sessions session files
 // - save/load direct API assertions -> handler behavior proving per-session persisted dedupe isolation
-// Dropped reference cases:
+// Dropped cases:
 // - None.
 
 import assert from "node:assert/strict";

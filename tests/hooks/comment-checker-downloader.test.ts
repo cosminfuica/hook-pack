@@ -1,5 +1,4 @@
-// Ported/adapted from: docs/reference/hooks/comment-checker/downloader.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - cache root moved from user cache dirs to CLAUDE_PLUGIN_DATA/comment-checker/bin
 // - downloader uses npm tar package, not system tar or a custom parser
 // - unsupported zip/Windows assets fail open

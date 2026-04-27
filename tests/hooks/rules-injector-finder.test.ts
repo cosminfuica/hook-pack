@@ -1,10 +1,9 @@
-// Ported from: docs/reference/hooks/rules-injector/finder.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - bun:test -> node:test/node:assert/strict
 // - findRuleFiles(projectRoot, homeDir, currentFile) -> loadMatchingRules({ projectRoot, targetPath, homedir, includeUserRules })
 // - discovery assertions use MatchingRuleBlock projectRelativePath/body/matchReason instead of RuleFileCandidate internals where rules must match target
 // - user-home rules default to disabled via includeUserRules: false; explicit includeUserRules: true cases cover generic user-home dirs
-// Dropped reference cases:
+// Dropped cases:
 // - .sisyphus/rules discovery cases dropped.
 // - .opencode/rules and OPENCODE_USER_RULE_DIRS cases dropped.
 

@@ -1,5 +1,4 @@
-// Adapted from: docs/reference/hooks/directory-agents-injector/finder.ts, injector.ts, and storage.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - native HookEnvelope + HookRuntimeContext handler factory
 // - PostToolUse Read additionalContext instead of output mutation
 // - file-backed JSON state under CLAUDE_PLUGIN_DATA

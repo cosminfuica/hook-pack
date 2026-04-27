@@ -8,7 +8,6 @@ export interface DynamicTruncatorOptions {
   readonly modelCacheState?: { readonly anthropicContext1MEnabled: boolean } | undefined;
 }
 
-// docs/reference/shared/dynamic-truncator.ts is absent in this snapshot; contract-compatible implementation only.
 export function createDynamicTruncator(options: DynamicTruncatorOptions): DynamicTruncator {
   const effectiveLimit = usesLargeContextWindow(options) ? 5 * options.maxContextChars : options.maxContextChars;
 

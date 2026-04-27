@@ -1,8 +1,7 @@
-// Ported from: docs/reference/hooks/rules-injector/project-root-finder.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - bun:test -> node:test/node:assert/strict
 // - mocked node:fs memoization case -> filesystem-backed boundary tests for canonical cwdBoundary behavior
-// Dropped reference cases:
+// Dropped cases:
 // - None.
 
 import assert from "node:assert/strict";

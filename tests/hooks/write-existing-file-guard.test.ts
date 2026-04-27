@@ -1,5 +1,4 @@
-// Ported from: docs/reference/hooks/write-existing-file-guard/index.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - bun:test -> node:test/node:assert/strict
 // - PluginInput fixture -> HookEnvelope + HookRuntimeContext
 // - thrown block error -> structured HookExecutionResult deny message

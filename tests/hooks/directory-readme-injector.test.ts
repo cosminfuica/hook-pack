@@ -1,5 +1,4 @@
-// Ported from: docs/reference/hooks/directory-readme-injector/injector.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - bun:test -> node:test/node:assert/strict
 // - PluginInput fixture -> HookEnvelope + HookRuntimeContext handler calls
 // - output.output mutation checks -> HookExecutionResult.additionalContext and combineHookResults prefix checks
@@ -27,7 +26,7 @@ interface DirectoryInjectorFixture {
 }
 
 describe("directory-readme-injector", () => {
-  it("injects README.md content from file's parent directory into output [ported]", async () => {
+  it("injects README.md content from file's parent directory into output", async () => {
     await withDirectoryInjectorFixture(async (fixture) => {
       const sourceDirectory = join(fixture.cwd, "src");
       writeFixtureFile(join(sourceDirectory, "README.md"), "# Source README\nlocal context");
@@ -43,7 +42,7 @@ describe("directory-readme-injector", () => {
     });
   });
 
-  it("includes root-level README.md (unlike agents-injector) [ported]", async () => {
+  it("includes root-level README.md (unlike agents-injector)", async () => {
     await withDirectoryInjectorFixture(async (fixture) => {
       writeFixtureFile(join(fixture.cwd, "README.md"), "# Root README\nroot context");
       writeFixtureFile(join(fixture.cwd, "file.ts"), "export const rootFile = true;\n");
@@ -56,7 +55,7 @@ describe("directory-readme-injector", () => {
     });
   });
 
-  it("injects multiple README.md when walking up directory tree [ported]", async () => {
+  it("injects multiple README.md when walking up directory tree", async () => {
     await withDirectoryInjectorFixture(async (fixture) => {
       const componentsDirectory = join(fixture.cwd, "src", "components");
       writeFixtureFile(join(fixture.cwd, "README.md"), "# Root README");
@@ -73,7 +72,7 @@ describe("directory-readme-injector", () => {
     });
   });
 
-  it("does not re-inject already cached directories [ported]", async () => {
+  it("does not re-inject already cached directories", async () => {
     await withDirectoryInjectorFixture(async (fixture) => {
       writeFixtureFile(join(fixture.cwd, "src", "README.md"), "# Source README");
       writeFixtureFile(join(fixture.cwd, "src", "a.ts"), "export const a = true;\n");
@@ -87,7 +86,7 @@ describe("directory-readme-injector", () => {
     });
   });
 
-  it("shows truncation notice when content is truncated [ported]", async () => {
+  it("shows truncation notice when content is truncated", async () => {
     await withDirectoryInjectorFixture(async (fixture) => {
       writeFixtureFile(join(fixture.cwd, "src", "README.md"), "# Truncated README\nabcdefghi");
       writeFixtureFile(join(fixture.cwd, "src", "file.ts"), "export const file = true;\n");
@@ -103,7 +102,7 @@ describe("directory-readme-injector", () => {
     });
   });
 
-  it("does nothing when filePath cannot be resolved [ported]", async () => {
+  it("does nothing when filePath cannot be resolved", async () => {
     await withDirectoryInjectorFixture(async (fixture) => {
       writeFixtureFile(join(fixture.cwd, "README.md"), "# Root README");
 

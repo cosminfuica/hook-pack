@@ -1,9 +1,8 @@
-// Ported from: docs/reference/hooks/rules-injector/rule-scan-cache.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - bun:test -> node:test/node:assert/strict
 // - in-memory createRuleScanCache assertions -> file-backed per-session scan cache through loadMatchingRules cache options
 // - mocked scanner reuse case -> filesystem mutation proves cached candidate paths are reused until lifecycle cleanup removes scan-cache file
-// Dropped reference cases:
+// Dropped cases:
 // - None.
 
 import assert from "node:assert/strict";

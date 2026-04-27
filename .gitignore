@@ -5,8 +5,7 @@ skills-lock.json
 .claude
 .kilo
 .internal
-docs/reference
-docs/superpowers
+docs/reference/
 node_modules/
 # Build output: only the bundled dispatcher artifact ships in the repo so
 # `/plugin install` works without running npm install / npm run build.

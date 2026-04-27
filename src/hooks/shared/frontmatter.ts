@@ -1,4 +1,3 @@
-// Ported from: docs/reference/hooks/rules-injector/parser.ts
 
 interface RuleMetadata {
   description?: string;

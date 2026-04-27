@@ -1,9 +1,8 @@
-// Ported from: docs/reference/hooks/rules-injector/output-path.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - bun:test -> node:test/node:assert/strict
 // - ToolExecuteOutput shape -> HookEnvelope toolInput/toolResponse path extraction
 // - title fallback -> tool_response.metadata fallback because native envelopes do not expose legacy output.title
-// Dropped reference cases:
+// Dropped cases:
 // - None.
 
 import assert from "node:assert/strict";

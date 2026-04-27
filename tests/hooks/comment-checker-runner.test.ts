@@ -1,5 +1,4 @@
-// Ported/adapted from: docs/reference/hooks/comment-checker/cli.ts, cli-runner.ts, and cli.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - bun.spawn assertions -> child_process.spawn runner assertions
 // - checker command receives JSON on stdin and `check` argv
 // - exit code mapping preserved: 0 clean, 2 finding, other/error/missing/timeout unavailable

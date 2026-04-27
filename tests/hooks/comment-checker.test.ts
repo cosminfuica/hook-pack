@@ -1,11 +1,10 @@
-// Ported/adapted from: docs/reference/hooks/comment-checker/hook.ts, hook.lazy-init.test.ts, and hook.apply-patch.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - native HookEnvelope + HookRuntimeContext handler factory
 // - PostToolUse findings block continuation with stopDecision instead of mutating completed tool output
 // - in-memory pending calls become plugin-data state
 // - in-process initialization/runner lock is not ported because hook invocations are separate Node processes
 // - downloader/binary failures fail open within a hook-owned budget
-// - patch-tool reference behavior consulted but dropped as non-portable per docs/architecture/comment-checker-apply-patch-verification.md
+// - patch-tool behavior consulted but dropped as non-portable per docs/architecture/comment-checker-apply-patch-verification.md
 
 import assert from "node:assert/strict";
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";

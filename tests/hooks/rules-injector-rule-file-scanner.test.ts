@@ -1,8 +1,7 @@
-// Ported from: docs/reference/hooks/rules-injector/rule-file-scanner.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - bun:test -> node:test/node:assert/strict
 // - generic .claude/rules fixture replaces dropped orchestration-specific fixture path
-// Dropped reference cases:
+// Dropped cases:
 // - .sisyphus/rules discovery fixture path removed.
 
 import assert from "node:assert/strict";

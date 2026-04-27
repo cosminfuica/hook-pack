@@ -1,12 +1,11 @@
-// Ported from: docs/reference/hooks/rules-injector/injector.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - bun:test -> node:test/node:assert/strict
 // - createRuleInjectionProcessor mutation of output.output -> createRulesInjector handler returning HookExecutionResult.additionalContext
 // - PluginInput/output fixtures -> HookEnvelope + HookRuntimeContext calls
 // - output-combiner assertion added for <hookId>: prefixed combined context
 // - session.compacted cleanup -> PreCompact envelope; SessionEnd cleanup case added
 // - parsed-rule cache tests use file-backed CLAUDE_PLUGIN_DATA cache across handler instances
-// Dropped reference cases:
+// Dropped cases:
 // - Orchestration-specific user rule dirs and env controls dropped.
 
 import assert from "node:assert/strict";

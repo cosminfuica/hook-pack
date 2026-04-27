@@ -1,5 +1,4 @@
-// Ported from: docs/reference/hooks/rules-injector/parser.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - bun:test → node:test/node:assert/strict
 // - Task 6 matcher parity cases added for picomatch glob patterns from rules-injector matcher port
 

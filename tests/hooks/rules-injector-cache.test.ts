@@ -1,9 +1,8 @@
-// Ported from: docs/reference/hooks/rules-injector/cache.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - bun:test -> node:test/node:assert/strict
 // - in-memory session cache store -> file-backed parsed-rule cache under CLAUDE_PLUGIN_DATA
 // - reference session-cache behavior moved to handler/storage tests because native migration stores session state with HookEnvelope sessions
-// Dropped reference cases:
+// Dropped cases:
 // - None.
 
 import assert from "node:assert/strict";

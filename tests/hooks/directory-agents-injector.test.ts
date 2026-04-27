@@ -1,5 +1,4 @@
-// Ported from: docs/reference/hooks/directory-agents-injector/injector.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - bun:test -> node:test/node:assert/strict
 // - PluginInput fixture -> HookEnvelope + HookRuntimeContext handler calls
 // - output.output mutation checks -> HookExecutionResult.additionalContext and combineHookResults prefix checks
@@ -31,7 +30,7 @@ interface DirectoryInjectorFixture {
 }
 
 describe("directory-agents-injector", () => {
-  it("injects AGENTS.md content from file's parent directory into output [ported]", async () => {
+  it("injects AGENTS.md content from file's parent directory into output", async () => {
     await withDirectoryInjectorFixture(async (fixture) => {
       writeFixtureFile(join(fixture.cwd, "src", "AGENTS.md"), SRC_AGENTS_CONTENT);
       writeFixtureFile(join(fixture.cwd, "src", "file.ts"), "export const sourceFile = true;\n");
@@ -46,7 +45,7 @@ describe("directory-agents-injector", () => {
     });
   });
 
-  it("finds AGENTS.md files while walking up directories [ported]", async () => {
+  it("finds AGENTS.md files while walking up directories", async () => {
     await withDirectoryInjectorFixture(async (fixture) => {
       const componentsDirectory = join(fixture.cwd, "src", "components");
       writeFixtureFile(join(fixture.cwd, "src", "AGENTS.md"), SRC_AGENTS_CONTENT);
@@ -74,7 +73,7 @@ describe("directory-agents-injector", () => {
     });
   });
 
-  it("injects multiple AGENTS.md when walking up directory tree [ported]", async () => {
+  it("injects multiple AGENTS.md when walking up directory tree", async () => {
     await withDirectoryInjectorFixture(async (fixture) => {
       const componentsDirectory = join(fixture.cwd, "src", "components");
       writeFixtureFile(join(fixture.cwd, "AGENTS.md"), ROOT_AGENTS_CONTENT);
@@ -91,7 +90,7 @@ describe("directory-agents-injector", () => {
     });
   });
 
-  it("does not re-inject already cached directories [ported]", async () => {
+  it("does not re-inject already cached directories", async () => {
     await withDirectoryInjectorFixture(async (fixture) => {
       const componentsDirectory = join(fixture.cwd, "src", "components");
       writeFixtureFile(join(fixture.cwd, "src", "AGENTS.md"), SRC_AGENTS_CONTENT);
@@ -106,7 +105,7 @@ describe("directory-agents-injector", () => {
     });
   });
 
-  it("shows truncation notice when content is truncated [ported]", async () => {
+  it("shows truncation notice when content is truncated", async () => {
     await withDirectoryInjectorFixture(async (fixture) => {
       writeFixtureFile(join(fixture.cwd, "src", "AGENTS.md"), "# Truncated AGENTS\nabcdefghi");
       writeFixtureFile(join(fixture.cwd, "src", "file.ts"), "export const sourceFile = true;\n");
@@ -122,7 +121,7 @@ describe("directory-agents-injector", () => {
     });
   });
 
-  it("does nothing when filePath cannot be resolved [ported]", async () => {
+  it("does nothing when filePath cannot be resolved", async () => {
     await withDirectoryInjectorFixture(async (fixture) => {
       writeFixtureFile(join(fixture.cwd, "AGENTS.md"), ROOT_AGENTS_CONTENT);
 

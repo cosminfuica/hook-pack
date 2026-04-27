@@ -1,4 +1,3 @@
-// Ported from: docs/reference/hooks/rules-injector/matcher.ts.
 
 import { createHash } from "crypto";
 import { relative } from "node:path";

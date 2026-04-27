@@ -4,13 +4,13 @@ User-facing reference for the hooks Hook Pack ships and how to configure them. T
 
 ## Hooks shipped today
 
-| Hook ID | Native events | Purpose |
-| --- | --- | --- |
-| `comment-checker` | `PreToolUse`, `PostToolUse`, `PreCompact`, `SessionEnd` | Detects unnecessary comments after write/edit-style tools when a checker command or downloaded binary is available; findings block continuation so the agent fixes them. |
-| `directory-agents-injector` | `PostToolUse`, `PreCompact`, `SessionEnd` | Injects nested `AGENTS.md` context after successful `Read` results. |
-| `directory-readme-injector` | `PostToolUse`, `PreCompact`, `SessionEnd` | Injects relevant `README.md` context after successful `Read` results. |
-| `rules-injector` | `PostToolUse`, `PreCompact`, `SessionEnd` | Injects matching project rule files (`.github/instructions`, `.cursor/rules`, `.claude/rules`) after successful file read/write/edit tools. |
-| `write-existing-file-guard` | `PreToolUse`, `PostToolUse`, `PreCompact`, `SessionEnd` | Blocks unsafe `Write` overwrites until the file has been read successfully in the same session. |
+| Hook ID                     | Native events                                           | Purpose                                                                                                                                                                  |
+| --------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `comment-checker`           | `PreToolUse`, `PostToolUse`, `PreCompact`, `SessionEnd` | Detects unnecessary comments after write/edit-style tools when a checker command or downloaded binary is available; findings block continuation so the agent fixes them. |
+| `directory-agents-injector` | `PostToolUse`, `PreCompact`, `SessionEnd`               | Injects nested `AGENTS.md` context after successful `Read` results.                                                                                                      |
+| `directory-readme-injector` | `PostToolUse`, `PreCompact`, `SessionEnd`               | Injects relevant `README.md` context after successful `Read` results.                                                                                                    |
+| `rules-injector`            | `PostToolUse`, `PreCompact`, `SessionEnd`               | Injects matching project rule files (`.github/instructions`, `.cursor/rules`, `.claude/rules`) after successful file read/write/edit tools.                              |
+| `write-existing-file-guard` | `PreToolUse`, `PostToolUse`, `PreCompact`, `SessionEnd` | Blocks unsafe `Write` overwrites until the file has been read successfully in the same session.                                                                          |
 
 All five default to enabled.
 
@@ -18,13 +18,13 @@ All five default to enabled.
 
 Set through Claude Code's plugin options or `.claude/hook-pack.local.md`.
 
-| Field | Type | Default | Meaning |
-| --- | --- | --- | --- |
-| `enabled_hooks` | comma-separated string | empty | Hook IDs to enable beyond defaults. |
-| `disabled_hooks` | comma-separated string | empty | Hook IDs to disable. Always wins over enable. |
-| `enable_all_hooks_by_default` | boolean | `false` | When `true`, every shipped hook defaults to enabled unless listed in `disabled_hooks`. |
-| `max_context_chars` | number | `20000` | Fallback truncation limit when no model context window is detected. |
-| `include_user_rules` | boolean | `false` | When `true`, `rules-injector` also scans `~/.claude/rules`, `~/.cursor/rules`, `~/.github/instructions`. |
+| Field                         | Type                   | Default | Meaning                                                                                                  |
+| ----------------------------- | ---------------------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| `enabled_hooks`               | comma-separated string | empty   | Hook IDs to enable beyond defaults.                                                                      |
+| `disabled_hooks`              | comma-separated string | empty   | Hook IDs to disable. Always wins over enable.                                                            |
+| `enable_all_hooks_by_default` | boolean                | `false` | When `true`, every shipped hook defaults to enabled unless listed in `disabled_hooks`.                   |
+| `max_context_chars`           | number                 | `20000` | Fallback truncation limit when no model context window is detected.                                      |
+| `include_user_rules`          | boolean                | `false` | When `true`, `rules-injector` also scans `~/.claude/rules`, `~/.cursor/rules`, `~/.github/instructions`. |
 
 ## Project-local override
 

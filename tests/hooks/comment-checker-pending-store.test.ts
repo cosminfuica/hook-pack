@@ -1,10 +1,9 @@
-// Ported/adapted from: docs/reference/hooks/comment-checker/pending-calls.ts and pending-calls.test.ts
-// Adaptations:
+// Native Claude Code adaptations:
 // - bun:test -> node:test/node:assert/strict
 // - in-memory pending map -> per-session plugin-data files under CLAUDE_PLUGIN_DATA
 // - pending call TTL preserved at 60_000ms
 // - state contains only checker metadata; no tool output or transcript payloads
-// - patch-tool reference behavior consulted but dropped as non-portable per docs/architecture/comment-checker-apply-patch-verification.md
+// - patch-tool behavior consulted but dropped as non-portable per docs/architecture/comment-checker-apply-patch-verification.md
 
 import assert from "node:assert/strict";
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
