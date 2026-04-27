@@ -27,7 +27,7 @@ if (isRecord(hooksConfig)) {
 
 validateExecutableFile("hooks/dispatch.sh", "hooks/dispatch.sh");
 validateFileExists("dist/hook-pack-dispatch.mjs", "runtime dispatch artifact");
-validateRegistryGovernance();
+validateRegistryArtifact();
 
 if (errors.length > 0) {
   process.stderr.write(`${errors.map((error) => `- ${error}`).join("\n")}\n`);
@@ -110,7 +110,7 @@ function validateFileExists(pathFromRoot, label) {
   }
 }
 
-function validateRegistryGovernance() {
+function validateRegistryArtifact() {
   const registryPath = "dist/src/core/registry.js";
   const absoluteRegistryPath = resolve(repoRoot, registryPath);
   if (!existsSync(absoluteRegistryPath)) {
@@ -121,7 +121,6 @@ function validateRegistryGovernance() {
   const registrySource = readFileSync(absoluteRegistryPath, "utf8");
   const registryInitializer = extractBuiltInRegistryInitializer(registrySource);
   const stableIds = [...registryInitializer.matchAll(/id:\s*["']([^"']*)["']/g)].map((match) => match[1]);
-  const nonEmptyStableIds = [];
   const seenStableIds = new Set();
   const duplicateStableIds = new Set();
   for (const stableId of stableIds) {
@@ -136,58 +135,11 @@ function validateRegistryGovernance() {
     }
 
     seenStableIds.add(stableId);
-    nonEmptyStableIds.push(stableId);
   }
 
   for (const duplicateStableId of duplicateStableIds) {
     errors.push(`registry artifact BUILT_IN_REGISTRY must not contain duplicate id ${duplicateStableId}`);
   }
-
-  const uniqueStableIds = [...new Set(nonEmptyStableIds)];
-  if (uniqueStableIds.length === 0) {
-    return;
-  }
-
-  const governancePath = "docs/architecture/migration-governance.md";
-  const absoluteGovernancePath = resolve(repoRoot, governancePath);
-  if (!existsSync(absoluteGovernancePath)) {
-    errors.push(`migration governance docs must exist when registry IDs are implemented at ${governancePath}`);
-    return;
-  }
-
-  const governanceSource = readFileSync(absoluteGovernancePath, "utf8");
-  for (const stableId of uniqueStableIds) {
-    validateGovernanceRecord(stableId, governanceSource);
-  }
-}
-
-function validateGovernanceRecord(stableId, governanceSource) {
-  const recordHeader = `## Migration Feasibility Record: ${stableId}`;
-  const recordStart = governanceSource.indexOf(recordHeader);
-  if (recordStart === -1) {
-    errors.push(`migration governance docs must include ${recordHeader}`);
-    return;
-  }
-
-  const nextRecordStart = governanceSource.indexOf("## Migration Feasibility Record:", recordStart + recordHeader.length);
-  const record = governanceSource.slice(recordStart, nextRecordStart === -1 ? undefined : nextRecordStart);
-  for (const requiredSubstring of requiredGovernanceRecordSubstrings(stableId)) {
-    if (!record.includes(requiredSubstring)) {
-      errors.push(`migration governance record for ${stableId} must include ${requiredSubstring}`);
-    }
-  }
-}
-
-function requiredGovernanceRecordSubstrings(stableId) {
-  return [
-    `## Migration Feasibility Record: ${stableId}`,
-    `Stable ID: ${stableId}`,
-    "Decision: portable",
-    "### Reference source",
-    "### State and lifecycle",
-    "### Tests required before implementation",
-    "### Orchestration neutrality"
-  ];
 }
 
 function extractBuiltInRegistryInitializer(registrySource) {

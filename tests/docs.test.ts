@@ -25,7 +25,6 @@ describe("foundation documentation", () => {
     assertIncludes(readme, "/plugin marketplace add", "README.md");
     assertIncludes(readme, "/plugin install", "README.md");
     assertIncludes(readme, "docs/configuration.md", "README.md");
-    assertIncludes(readme, "docs/architecture", "README.md");
   });
 
   it("documents user configuration requirements in docs/configuration.md", () => {
@@ -40,24 +39,8 @@ describe("foundation documentation", () => {
     assertIncludes(config, "SessionEnd", "docs/configuration.md");
   });
 
-  it("documents foundation runtime boundaries", () => {
-    const foundation = readRequiredDoc("docs/architecture/hook-pack-foundation.md");
-
-    assertIncludes(foundation, "OpenCode reference hooks are migration inventory", "foundation architecture docs");
-    assertIncludes(foundation, "Native Claude Code events are the runtime boundary", "foundation architecture docs");
-  });
-
-  it("documents migration governance requirements", () => {
-    const governance = readRequiredDoc("docs/architecture/migration-governance.md");
-
-    assertIncludes(governance, "Migration Feasibility Record", "migration governance docs");
-    assertIncludes(governance, "portable", "migration governance docs");
-    assertIncludes(governance, "redesign-needed", "migration governance docs");
-  });
-
-  it("documents Tier 1 migrated hook IDs, lifecycle cleanup, and neutrality posture", () => {
+  it("documents Tier 1 shipped hook IDs and lifecycle cleanup", () => {
     const config = readRequiredDoc("docs/configuration.md");
-    const governance = readRequiredDoc("docs/architecture/migration-governance.md");
 
     for (const hookId of [
       "comment-checker",
@@ -67,17 +50,8 @@ describe("foundation documentation", () => {
       "write-existing-file-guard"
     ]) {
       assertIncludes(config, hookId, "docs/configuration.md");
-      const recordStart = governance.indexOf(`## Migration Feasibility Record: ${hookId}`);
-      assert.notEqual(recordStart, -1, `migration governance docs must include record header for ${hookId}`);
-      const nextRecordStart = governance.indexOf("## Migration Feasibility Record:", recordStart + 1);
-      const record = governance.slice(recordStart, nextRecordStart === -1 ? undefined : nextRecordStart);
-      assertIncludes(record, `Stable ID: ${hookId}`, `record stable ID for ${hookId}`);
-      assertIncludes(record, "Decision: portable", `record for ${hookId}`);
-      assertIncludes(record, "docs/reference/hooks", `record reference source for ${hookId}`);
-      assertIncludes(record, "### Tests required before implementation", `record test list for ${hookId}`);
-      assertIncludes(record, "Reference test ports:", `record port list for ${hookId}`);
-      assertIncludes(record, "### State and lifecycle", `record state section for ${hookId}`);
-      assertIncludes(record, "### Orchestration neutrality", `record neutrality section for ${hookId}`);
     }
+    assertIncludes(config, "PreCompact", "docs/configuration.md");
+    assertIncludes(config, "SessionEnd", "docs/configuration.md");
   });
 });

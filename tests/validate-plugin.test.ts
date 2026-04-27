@@ -22,7 +22,6 @@ interface FixtureOptions {
   readonly hookCommand?: string;
   readonly hookTimeout?: number;
   readonly registrySource?: string;
-  readonly governanceSource?: string;
 }
 
 const defaultHookCommand = 'bash "${CLAUDE_PLUGIN_ROOT}/hooks/dispatch.sh" PreToolUse';
@@ -97,10 +96,6 @@ function createFixture(options: FixtureOptions = {}): string {
     options.registrySource ?? "export const BUILT_IN_REGISTRY = [];\n",
     "utf8"
   );
-  if (options.governanceSource !== undefined) {
-    mkdirSync(resolve(root, "docs", "architecture"), { recursive: true });
-    writeFileSync(resolve(root, "docs", "architecture", "migration-governance.md"), options.governanceSource, "utf8");
-  }
   return root;
 }
 
@@ -115,42 +110,6 @@ async function withFixture(options: FixtureOptions, run: (root: string) => Promi
   } finally {
     rmSync(root, { force: true, recursive: true });
   }
-}
-
-function governanceRecordForImplementedHook(sections: readonly string[]): string {
-  return [
-    "# Migration Governance",
-    "",
-    "## Migration Feasibility Record: implemented-hook",
-    "",
-    "Stable ID: implemented-hook",
-    "Decision: portable",
-    "",
-    ...sections.flatMap((section) => [section, ""])
-  ].join("\n");
-}
-
-function governanceRecord(parts: {
-  readonly header?: string | undefined;
-  readonly stableId?: string | undefined;
-  readonly decision?: string | undefined;
-  readonly sections?: readonly string[] | undefined;
-}): string {
-  return [
-    "# Migration Governance",
-    "",
-    parts.header ?? "## Migration Feasibility Record: implemented-hook",
-    "",
-    parts.stableId ?? "Stable ID: implemented-hook",
-    parts.decision ?? "Decision: portable",
-    "",
-    ...(parts.sections ?? [
-      "### Reference source",
-      "### State and lifecycle",
-      "### Tests required before implementation",
-      "### Orchestration neutrality"
-    ]).flatMap((section) => [section, ""])
-  ].join("\n");
 }
 
 describe("plugin validator", () => {
@@ -202,7 +161,7 @@ describe("plugin validator", () => {
     });
   });
 
-  it("fails when implemented registry IDs lack stable ID governance docs", async () => {
+  it("accepts implemented registry IDs without architecture governance docs", async () => {
     await withFixture(
       {
         registrySource: implementedHookRegistrySource
@@ -210,24 +169,14 @@ describe("plugin validator", () => {
       async (root) => {
         const result = await runValidator(resolve(root, "scripts", "validate-plugin.mjs"), root);
 
-        assert.notEqual(result.exitCode, 0);
-        assert.equal(result.stdout, "");
-        assert.match(
-          result.stderr,
-          /^- migration governance docs must exist when registry IDs are implemented at docs\/architecture\/migration-governance\.md/m
-        );
+        assert.equal(result.exitCode, 0);
+        assert.equal(result.stdout.trim(), "hook-pack plugin validation passed");
+        assert.equal(result.stderr, "");
       }
     );
   });
 
   it("fails when implemented registry IDs are empty or duplicated", async () => {
-    const requiredSections = [
-      "### Reference source",
-      "### State and lifecycle",
-      "### Tests required before implementation",
-      "### Orchestration neutrality"
-    ];
-
     await withFixture(
       {
         registrySource: emptyIdRegistrySource
@@ -243,8 +192,7 @@ describe("plugin validator", () => {
 
     await withFixture(
       {
-        registrySource: duplicateHookRegistrySource,
-        governanceSource: governanceRecordForImplementedHook(requiredSections)
+        registrySource: duplicateHookRegistrySource
       },
       async (root) => {
         const result = await runValidator(resolve(root, "scripts", "validate-plugin.mjs"), root);
@@ -255,75 +203,4 @@ describe("plugin validator", () => {
       }
     );
   });
-
-  it("fails when implemented registry governance records lack required sections", async () => {
-    const requiredSections = ["### Reference source", "### State and lifecycle", "### Tests required before implementation", "### Orchestration neutrality"];
-    const missingCases = [
-      {
-        governanceSource: governanceRecord({ stableId: "Stable ID: other-hook" }),
-        expected: "Stable ID: implemented-hook"
-      },
-      {
-        governanceSource: governanceRecord({ decision: "Decision: redesign-needed" }),
-        expected: "Decision: portable"
-      },
-      ...requiredSections.map((section) => ({
-        governanceSource: governanceRecord({ sections: requiredSections.filter((candidate) => candidate !== section) }),
-        expected: section
-      }))
-    ];
-
-    for (const { governanceSource, expected } of missingCases) {
-      await withFixture(
-        {
-          registrySource: implementedHookRegistrySource,
-          governanceSource
-        },
-        async (root) => {
-          const result = await runValidator(resolve(root, "scripts", "validate-plugin.mjs"), root);
-
-          assert.notEqual(result.exitCode, 0);
-          assert.equal(result.stdout, "");
-          assert.match(
-            result.stderr,
-            new RegExp(`^- migration governance record for implemented-hook must include ${escapeRegExp(expected)}`, "m")
-          );
-        }
-      );
-    }
-
-    await withFixture(
-      {
-        registrySource: implementedHookRegistrySource,
-        governanceSource: governanceRecordForImplementedHook(requiredSections)
-      },
-      async (root) => {
-        const result = await runValidator(resolve(root, "scripts", "validate-plugin.mjs"), root);
-
-        assert.equal(result.exitCode, 0);
-        assert.equal(result.stdout.trim(), "hook-pack plugin validation passed");
-        assert.equal(result.stderr, "");
-      }
-    );
-  });
-
-  it("fails when implemented registry governance record header is missing", async () => {
-    await withFixture(
-      {
-        registrySource: implementedHookRegistrySource,
-        governanceSource: governanceRecord({ header: "## Migration Feasibility Record: other-hook" })
-      },
-      async (root) => {
-        const result = await runValidator(resolve(root, "scripts", "validate-plugin.mjs"), root);
-
-        assert.notEqual(result.exitCode, 0);
-        assert.equal(result.stdout, "");
-        assert.match(result.stderr, /^- migration governance docs must include ## Migration Feasibility Record: implemented-hook/m);
-      }
-    );
-  });
 });
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
